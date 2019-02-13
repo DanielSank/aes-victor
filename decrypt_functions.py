@@ -1,4 +1,4 @@
-# DeCyFunctions.py                             V. Sank 2/7/19 10:00pm
+# decrypt_functions.py                             V. Sank 2/7/19 10:00pm
 # Functions defined in this file:
 #     These functions and order of data is based on NIST FIPS 197.
 #     Figure and section numbers refer to that document.
@@ -23,7 +23,7 @@ Nr = int(14)
 import numpy as np
 import math    # do we need this?
 
-def GetKey():  # tested 1/4/19    same as in cypher routine
+def get_key():  # tested 1/4/19    same as in cypher routine
     #Input:  none
     #Output: 8 element int array with 32 bits size in each element
 #        keystr = cykeystr.read().replace'\n', '')
@@ -51,7 +51,7 @@ def GetKey():  # tested 1/4/19    same as in cypher routine
 
 
 #   KeyExpansion tested and agrees with NIST 197 1/26/19   called from DeCypherMain
-def KeyExpansion(key):    # 12/24/18  treat key as a 8 word linear array
+def key_expansion(key):    # 12/24/18  treat key as a 8 word linear array
     # input   key(8) words.  read in as eight 4-byte words = 256 bits
     #         each word is an integers with values from 0 to 2^32 - 1
     # output  w(60) words.  an array of 60 4-byte word with 0 <= i <= 59
@@ -96,7 +96,7 @@ def KeyExpansion(key):    # 12/24/18  treat key as a 8 word linear array
     return w
 # end KeyExpansion()
 
-def GetCTData():  # 1/26/19
+def get_ct_data():  # 1/26/19
 #   read in plaintext data written in hex from file PTCTData.txt
 #   split into 4 elements where each represents 32 bits = 4 bytes
 #   convert each element from hex to integer
@@ -135,7 +135,7 @@ def GetCTData():  # 1/26/19
 #End GetCTData()
 
 
-def AddRoundKey(state,w,round):  # 1/26/19  xor w with columns of state
+def add_round_key(state, w, round):  # 1/26/19  xor w with columns of state
     # input:  state array, w (called round key), round #
     # output: state array xored with 4 words of w     Size w = (Nr+1)*Nb
     # other functions used:  none     ^ is bitwise xor
@@ -307,7 +307,7 @@ def SubWord(wordin):       # breaks wordin into bytes and calls SBoxByte
 
 
 
-def InvSubBytes(state):
+def invert_sub_bytes(state):
     #input: state
     #output: state   each byte represents polynomial inverse of original
     #functions used: ISBoxByte, hexprint (print, input)
@@ -329,7 +329,7 @@ def InvSubBytes(state):
 # end InvSubBytes(state)
 
 
-def InvShiftRows(state):     # reverse process from ShiftRows
+def invert_shift_rows(state):     # reverse process from ShiftRows
     # Input:   state
     # Output:  state with rows shifted right by r
     # functions used:  none (print)
@@ -368,7 +368,7 @@ def InvShiftRows(state):     # reverse process from ShiftRows
 # 4 8 12 16                 16  4  8 12
 # end InvShiftRows(state):
 
-def InvMixColumns(state):     #  see sections 5.1.3 and 5.3.3 of NIST 197
+def invert_mix_columns(state):     #  see sections 5.1.3 and 5.3.3 of NIST 197
     # input:   state array,
     # output: state array with changes based on non binary polynomial multiply
     # other functions used:  none     ^ is bitwise xor
@@ -448,7 +448,7 @@ def InvMixColumns(state):     #  see sections 5.1.3 and 5.3.3 of NIST 197
 
 
 
-def OutPTData(state):    #output cypher text (CT) data to PTData.txt
+def out_pt_data(state):    #output cypher text (CT) data to plaintex.txt
 #   convert each column of state to integer then write as hex string
     PTData = [0] * 4     # create an int array(4)
     c = 0
@@ -458,7 +458,7 @@ def OutPTData(state):    #output cypher text (CT) data to PTData.txt
         c = c + 1
     # end while c
 
-    textfile = open('PTData.txt', 'a')  # open('PTData.txt', 'for appending')
+    textfile = open('plaintex.txt', 'a')  # open('plaintex.txt', 'for appending')
     c = 0
     while c < 4:         # could combine this while loop with the one above
 #        textfile.write('{:08x}'.format(int(PTData[c])))  # 08 forces the leading zeros, x for hex
@@ -476,7 +476,7 @@ def OutPTData(state):    #output cypher text (CT) data to PTData.txt
 #End OutPTData()
 
 
-def printhex(state):
+def print_hex(state):
     r = 0
     while r < 4:
         print(hex(int(state[r,0])), hex(int(state[r,1])),hex(int(state[r,2])),hex(int(state[r,3])) )
