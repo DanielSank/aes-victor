@@ -3,14 +3,18 @@ import numpy as np
 from constants import Nb, Nk, Nr
 
 
-def get_key() -> np.ndarray:
-    """
-    Returns: 8 element int array with 32 bits size in each element
-    """
-    keyfile = open('CyKey.txt', 'r')
-    keytext = keyfile.read()
-    keyfile.close()
+def get_key(filename: str='key.txt') -> np.ndarray:
+    """Returns: 8 element array of i32
 
+    The key file must contain set of eight space-separated blocks of data in
+    hex representation, each one 8 characters long (32 bits) for a total of
+    256 bits. For example:
+        00010203 04050607 08090a0b 0c0d0e0f 10111213 14151617 18191a1b 1c1d1e1f
+    """
+    with open(filename, 'r') as keyfile:
+        keytext = keyfile.read()
+    return np.array([int(x, 16) for x in keytext.split(' ')])
+    """
     textarray = keytext.split(' ')
     key = [0] * 8
     i = 0
@@ -18,36 +22,28 @@ def get_key() -> np.ndarray:
         key[i] = int(textarray[i], 16)
         i = i + 1
     return key
+    """
 
 
-def key_expansion(key):  # 12/24/18  treat key as a 8 word linear array
-    #   KeyExpansion tested and agrees with NIST 197 1/26/19
-    # input   key(8) words.  read in as eight 4-byte words = 256 bits
-    #         each word is an integers with values from 0 to 2^32 - 1
-    # output  w(60) words.  an array of 60 4-byte word with 0 <= i <= 59
-    # Functions called:  RotWord, Rcon, SubWord
-    # might be easier to deal with w[] as a single byte elements wbyte[j] with 0<= j <= 239 = 4*60 - 1
-    # key() = np.array((8), dtype = 'uint32') # 8 element 4-byte-word array = 32 byte total = 256 bits
-    w = np.zeros(
-        60, dtype='uint32'
-    )  # w[] is a 60 word array and is the output of this function
-    i = int(0)
-    while i < Nk:  # Nk = 8, create first 8 values of w from the key, w[0] to w[7]
-        w[i] = key[
-            i]  # arrays are previously defined, put value of key[i] into first Nk of w[i]
-        i = i + 1
+def key_expansion(key: np.ndarray) -> np.ndarray:
+    """
+    Args:
+        key: eight 4-byte words = 256 bits. Each word is an integer with values
+            from 0 to 2^32 - 1.
+
+    Returns:
+        The expanded key, an array of 60 4-byte elements
+    """
+    w = np.zeros(60, dtype='uint32')
+    w[0: Nk] = key[0: Nk]
     i = Nk  # i = 8
-    while i < Nb * (Nr + 1):  # while i < 60
-        temp = w[i - 1]  # start with temp = w(7)    temp is a 4 byte word
-        if i % Nk == 0:  # if i is a multiple of 8.  Runs between 8 and 56
-            temp = int(sub_word(rot_word(temp))) ^ r_con(int(
-                i / Nk))  # ^ is bitwise xor
+    while i < Nb * (Nr + 1):
+        temp = w[i - 1]  # Start with temp = w(7)
+        if i % Nk == 0:  # If i is a multiple of 8.
+            temp = int(sub_word(rot_word(temp))) ^ r_con(int(i / Nk))
         elif i % Nk == 4:
-            temp = int(sub_word(
-                temp))  # convert each byte of w[] via sbox, one word at a time
-        w[i] = w[
-            i -
-            Nk] ^ temp  # xor 8th previous w[] starting with w[0] with temp(w[7])
+            temp = int(sub_word(temp))
+        w[i] = w[i - Nk] ^ temp
         i = i + 1
     return w
 

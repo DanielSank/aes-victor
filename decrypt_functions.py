@@ -31,7 +31,7 @@ def get_key():  # tested 1/4/19    same as in cypher routine
 #   key must be input with space between every 4 bytes = 8 hex characters
 #   split into 8 word elements where each represents 32 bits = 4 bytes
 #   convert each element from hex to integer  Word will have 8 pieces of 8 hex characters each
-    keyfile = open('CyKey.txt', 'r')   # open('CyKey.txt', 'r')  cyph and decyph uses same key
+    keyfile = open('key.txt', 'r')   # open('CyKey.txt', 'r')  cyph and decyph uses same key
     keytext = keyfile.read()           # do the read
     keyfile.close()
 

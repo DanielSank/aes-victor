@@ -1,15 +1,13 @@
+"""
+This is the main routine for performing AES-256 encryption. It reads a key from
+key.txt and performs key expansion. Then it reads plain text data from
+plaintex.txt', and encrypts that data using the key. It then writes the
+encrypted data to CTData.txt.
+"""
+
 from constants import Nr
 from encrypt_functions import get_key, get_pt_data, out_ct_data, print_hex
 from encrypt_functions import key_expansion, add_round_key, sub_bytes, shift_rows, mix_columns
-
-print('This is the main routine for performing AES-256 encryption. It will:')
-print('   read a key from CyKey.txt and perform KeyExpansion')
-print('   read the plain text data from  plaintex.txt')
-print(
-    '   cypher the data using the key in CyKey.txt and return the cypher text')
-print('     in CTData.txt and also write the cypher text to the screen.')
-print('     In some cases leading zeros may not be shown')
-input('   press Enter to continue')
 
 key = get_key()
 w = key_expansion(key)  # Perform KeyExpansion  input key(8), output w(60) = expanded key
